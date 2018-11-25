@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro">
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			border: 0;
+			font-family: 'Source Code Pro', monospace;
+			color: #eeffff
+		} body {
+			background-color: #263238
+		} h1 {
+			color: #f07178
+		} .prog {
+			color: #f07178
+		} .comm {
+			color: #516d7a
+		} .tab {
+			margin-left: 25px
+		} .mb {
+			color: #c792ea
+		} .var {
+			color: #82aaff
+		} .cont {
+			color: #c3e88d
+		} .man {
+			color: #ffcb6b
+		} .const {
+			color: #89ddff
+		}
+	</style>
+</head>
+<body>
+
+	<h1>Program Documentation</h1><h2 style="margin-bottom:30px">(FLL 2018/2019) - LEV3LUP</h2>
+
+
+	<h2 style="display:inline"><span class="prog">_PIDCorr</span>ection</h2><span class="comm"> (Directly <span class="prog">P</span>roportional, <span class="prog">I</span>ntegral, <span class="prog">D</span>ifferential)</span>
+
+    	<p class="tab">--------------------------------------------------------------</p>
+
+  			<p class="tab">Dependencies: !<span class="prog">_PIDInit</span></p>
+
+
+  			<p class="tab">Parameters: <span class="mb">Sensor(num)</span></p>
+
+
+  			<p class="tab">Variables: <span class='var'>Error(num)</span>, <span class='var'>Target(num)</span>, <span class='var'>Invert[bool]</span>, <span class='var'>WError(num)</span>,</p>
+
+
+  			<p class="tab"><span class='var'>Weight[num]</span>, <span class='var'>Integral(num)</span>, <span class='var'>Derivative(num)</span>, <span class='var'>LError(num)</span>,</p>
+
+
+  			<p class="tab"><span class='var'>WDerivative(num)</span>, <span class='var'>Correction(num)</span>, <span class='var'>Speed(num)</span>, <span class='var'>MaxSpeed(num)</span></p>
+
+
+  			<p class="tab">Returned Values: <span class="mb">Correction(num)</span>, <span class="mb">Speed(num)</span></p>
+
+  		<p class="tab">--------------------------------------------------------------</p>
+
+  		<p class="tab"><span class="cont">--> 01. Sensory</span></p>
+
+  			<p class="tab"><span class='var'>Error</span> := <span class="mb">Sensor</span>/i - <span class="prog">!</span>Target</p>
+
+
+  			<p class="tab">(<span class='var'>Error</span> := -Error) <span class="cont">{if <span class="prog">!</span>Invert[0]}</span></p>
+
+  		<p class="tab"><span class="cont">--> 02. Directly Proportional</span></p>
+
+  			<p class="tab"><span class='var'>WError</span> := <span class="prog">!</span>Weight[0] * Error </p>
+
+  		<p class="tab"><span class="cont">--> 03. Integral</span></p>
+
+  			<p class="tab"><span class='var'>Integral</span> := <span class="prog">!</span>Integral + Weight[1] <span class="prog">*</span> Error</p>
+
+  		<p class="tab"><span class="cont">--> 04. Differential</span></p>
+
+  			<p class="tab"><span class='var'>Derivative</span> := Error - <span class="prog">!</span>LError</p>
+  			<p class="tab"><span class='var'>LError</span> := Error</p>
+  			<p class="tab"><span class='var'>WDerivative</span> := Weight[2] * Derivative</p>
+
+  		<p class="tab"><span class="cont">--> 05. Correction</span></p>
+  			<p class="tab"><span class='var'>Correction</span> := WError + Integral + WDerivative</p>
+
+  		<p class="tab"><span class="cont">--> 06. Motion</span></p>
+
+  			<p class="tab"><span class="cont">--> --> 06.01. Differential Speed Correction</span></p>
+  				<p class="tab"><span class='var'>Speed</span> := <span class="prog">!</span>MaxSpeed - Weight[3] <span class="prog">*</span> Derivative</p>
+
+  			<p class="tab"><span class="cont">--> --> 06.02. Direction</span></p>
+  				<p class="tab"><span class='var'>Speed</span> := -Speed <span class="cont">{if Invert[1]}</span></p>
+
+  		<p class="tab"><span class="cont">--> 07. Control</span></p>
+  			<p class="tab"><span class="mb">Correction</span>/o := Correction</p>
+  			<p class="tab" style="margin-bottom:30px"><span class="mb">Speed</span>/o := Speed</p>
+
+  	<h2 style="display:inline"><span class="prog">_PIDInit</span>ialization</h2>
+
+  		<p class="tab">--------------------------------------------------------------</p>
+
+  			<p class="tab">Dependencies: !<span class="man">Config</span></p>
+
+
+  			<p class="tab">Parameters: <span class="mb">Target(num)</span>, <span class="mb">FlipSide(bool)</span>, <span class="mb">Forward(bool)</span>,</p>
+
+  			<p class="tab"><span class="mb">Parameter[A, B, C, D](num)</span>, <span class="mb">MaxSpeed(num)</span></p>
+
+  			<p class="tab">Variables: <span class='var'>Target(num)</span>, <span class='var'>Invert[bool]</span>, <span class='var'>PosIsForw(bool)</span>,</p>
+
+
+  			<p class="tab"><span class='var'>Weight[num]</span>, <span class='var'>Integral(num)</span>, <span class='var'>LError(num)</span>, <span class='var'>MaxSpeed(num)</span></p>
+
+
+  			<p class="tab">Returned Values: <span class="mb">None</span></p>
+
+  		<p class="tab">--------------------------------------------------------------</p>
+
+  		<p class="tab"><span class="cont">--> 01. Variable (Re)Setting</span></p>
+
+  			<p class="tab"><span class='var'>Target</span> := <span class="mb">Target</span>/i</p>
+
+  			<p class="tab"><span class='var'>Invert</span> := []</p>
+
+  			<p class="tab"><span class='var'>Invert</span> => <i>append: </i><span class="mb">FlipSide</span>/i</p>
+
+  		<p class="tab"><span class="cont">*---------------------------------></span></p>
+  		<p class="tab"><span class="cont">|//* Read CONST:</span></p>
+  		<p class="tab"><span class="cont">|//* //* CloseFile(CONST)</span></p>
+  		<p class="tab"><span class="cont">|//* //* ---------------------</span></p>
+  		<p class="tab"><span class="cont">|//* //* ReadFile(num, CONST)</span></p>
+  		<p class="tab"><span class="cont">|//* //* or</span></p>
+  		<p class="tab"><span class="cont">|//* //* ReadFile(text, CONST)</span></p>
+  		<p class="tab"><span class="cont">*---------------------------------></span></p>
+
+  			<p class="tab">(<span class='var'>PosIsForw</span> := True) <span class="cont">{if <span class="const">FRW</span> == 'P'}</span></p>
+  			<p class="tab">or</p>
+  			<p class="tab">(<span class='var'>PosIsForw</span> := False) <span class="cont">{if <span class="const">FRW</span> == 'N'}</span></p>
+
+  			<p class="tab"><span class='var'>Invert</span> => <i>append: </i><span class="mb">Forward</span>/i <span class="prog">XOR</span> PosIsForw</p>
+
+  			<p class="tab"><span class='var'>Weight</span> := []</p>
+
+  			<p class="tab"><span class='var'>Weight</span> => <i>append: </i><span class="mb">Parameter A</span>/i</p>
+  			<p class="tab"><span class='var'>Weight</span> => <i>append: </i><span class="mb">Parameter B</span>/i</p>
+  			<p class="tab"><span class='var'>Weight</span> => <i>append: </i><span class="mb">Parameter C</span>/i</p>
+  			<p class="tab"><span class='var'>Weight</span> => <i>append: </i><span class="mb">Parameter D</span>/i</p>
+
+  			<p class="tab"><span class='var'>Integral</span> := 0</p>
+
+  			<p class="tab"><span class='var'>LError</span> := 0</p>
+
+  			<p class="tab" style="margin-bottom:30px"><span class='var'>MaxSpeed</span> := <span class="mb">MaxSpeed</span>/i</p>
+
+
+  	<h2 style="display:inline"><span class="man">Config</span>uration</h2>
+
+  		<p class="tab">--------------------------------------------------------------</p>
+
+  			<p class="tab">Dependencies: None</p>
+
+  			<p class="tab">Variables: <span class='var'>None</span></p>
+
+  		<p class="tab">--------------------------------------------------------------</p>
+
+  		<p class="tab"><span class="cont">--> 01. Writing Config Files</span></p>
+
+  		<p class="tab"><span class="cont">*---------------------------------></span></p>
+  		<p class="tab"><span class="cont">|//* Assign CONST:</span></p>
+  		<p class="tab"><span class="cont">|//* //* DeleteFile(CONST)</span></p>
+  		<p class="tab"><span class="cont">|//* //* AppendToFile(CONST, text)</span></p>
+  		<p class="tab"><span class="cont">*---------------------------------></span></p>
+
+  			<p class="tab"><span class="const">GYP</span> := '3'</p>
+  			<p class="tab"><span class="const">ULP</span> := '2'</p>
+  			<p class="tab"><span class="const">FCP</span> := '4'</p>
+  			<p class="tab"><span class="const">RCP</span> := '1'</p>
+  			<p class="tab"><span class="const">LAP</span> := '1'</p>
+  			<p class="tab"><span class="const">RAP</span> := '2'</p>
+  			<p class="tab"><span class="const">LMP</span> := '34'</p>
+  			<p class="tab" style="margin-bottom:700px"><span class="const">FRW</span> := 'N'</p>
+
+</body>
+</html>
